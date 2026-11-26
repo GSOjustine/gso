@@ -315,6 +315,38 @@
       background: #ffffff;
     }
 
+    .password-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .password-wrap input {
+      padding-right: 44px;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      color: #5c7c9e;
+      cursor: pointer;
+      padding: 4px 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      line-height: 1;
+      transition: color 0.15s ease;
+    }
+
+    .password-toggle:hover {
+      color: #1a1e2e;
+    }
+
     .form-error {
       margin: 0;
       min-height: 18px;
@@ -1111,7 +1143,12 @@
         </div>
         <div class="input-group">
           <label><i class="fas fa-lock"></i> Password</label>
-          <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" required>
+          <div class="password-wrap">
+            <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" required>
+            <button type="button" class="password-toggle" data-toggle-password="loginPassword" aria-label="Show password" title="Show password">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
         </div>
         <p class="form-error" id="loginError" role="alert"></p>
         <button type="submit" class="btn-submit">

@@ -48,17 +48,41 @@ export function checkRateLimit(key, maxRequests = 15, windowMs = 15 * 60 * 1000)
   return true;
 }
 
+function cleanEnvValue(val) {
+  return (val || '').trim().replace(/^['"]|['"]$/g, '').trim();
+}
+
 export function getSupabaseEnv() {
-  const supabaseUrl = (process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '').trim();
-  const supabaseAnonKey = (
+  const supabaseUrl = cleanEnvValue(process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL);
+  const supabaseAnonKey = cleanEnvValue(
     process.env.SUPABASE_ANON_KEY ||
     process.env.SUPABASE_PUBLISHABLE_KEY ||
-    process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
-    ''
-  ).trim();
-  const supabaseServiceRoleKey = (process.env.SUPABASE_SERVICE_ROLE_KEY || '').trim();
+    process.env.VITE_SUPABASE_PUBLISHABLE_KEY
+  );
+  const supabaseServiceRoleKey = cleanEnvValue(process.env.SUPABASE_SERVICE_ROLE_KEY);
 
   return { supabaseUrl, supabaseAnonKey, supabaseServiceRoleKey };
+}
+
+function getKeyMisconfigReason(serviceRoleKey) {
+  if (!serviceRoleKey || serviceRoleKey.includes('paste-your-')) {
+    return 'SUPABASE_SERVICE_ROLE_KEY is missing or still set to a placeholder in Vercel.';
+  }
+  if (serviceRoleKey.startsWith('sb_publishable_')) {
+    return 'SUPABASE_SERVICE_ROLE_KEY is set to a publishable key; use the service_role or sb_secret_ key.';
+  }
+  const parts = serviceRoleKey.split('.');
+  if (parts.length === 3) {
+    try {
+      const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString('utf8'));
+      if (payload?.role && payload.role !== 'service_role') {
+        return `SUPABASE_SERVICE_ROLE_KEY has role "${payload.role}" instead of "service_role".`;
+      }
+    } catch {
+      // Ignore malformed base64url; Supabase client will validate
+    }
+  }
+  return null;
 }
 
 export async function readJsonBody(req, maxBytes = 16384) {
@@ -119,6 +143,12 @@ export async function requireAdmin(req, res) {
     return null;
   }
 
+  const keyReason = getKeyMisconfigReason(supabaseServiceRoleKey);
+  if (keyReason) {
+    res.status(503).json({ error: keyReason });
+    return null;
+  }
+
   const authHeader = req.headers.authorization || '';
   const match = /^Bearer\s+(.+)$/i.exec(authHeader);
   if (!match) {
@@ -149,9 +179,21 @@ export async function requireAdmin(req, res) {
       .from('profiles')
       .select('id, role, is_active')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
 
-    if (profileErr || !profile || profile.role !== 'admin' || !profile.is_active) {
+    if (profileErr) {
+      res.status(503).json({
+        error: 'Unable to verify admin profile on server. Check SUPABASE_SERVICE_ROLE_KEY in Vercel.'
+      });
+      return null;
+    }
+
+    if (!profile || profile.role !== 'admin') {
+      res.status(403).json({ error: 'Administrator privileges required.' });
+      return null;
+    }
+
+    if (!profile.is_active) {
       res.status(403).json({ error: 'Administrator account is not active.' });
       return null;
     }

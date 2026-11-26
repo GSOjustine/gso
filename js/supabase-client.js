@@ -73,8 +73,27 @@
     };
   }
 
+  function bindPasswordToggles(root = document) {
+    root.querySelectorAll('[data-toggle-password]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const input = document.getElementById(btn.getAttribute('data-toggle-password'));
+        if (!input) return;
+        const show = input.type === 'password';
+        input.type = show ? 'text' : 'password';
+        btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+        btn.setAttribute('title', show ? 'Hide password' : 'Show password');
+        const icon = btn.querySelector('i');
+        if (icon) {
+          icon.classList.toggle('fa-eye', !show);
+          icon.classList.toggle('fa-eye-slash', show);
+        }
+      });
+    });
+  }
+
   global.gsoSupabase = {
     getSupabaseClient,
-    getAuthenticatedUserContext
+    getAuthenticatedUserContext,
+    bindPasswordToggles
   };
 })(window);

@@ -1434,6 +1434,38 @@
       border: 1px solid #f2c5c5;
     }
 
+    .password-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .password-wrap input {
+      padding-right: 42px;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 4px 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      line-height: 1;
+      transition: color 0.15s ease;
+    }
+
+    .password-toggle:hover {
+      color: var(--brand-800);
+    }
+
     .modal-close {
       background: transparent;
       border: none;
@@ -2124,11 +2156,21 @@
           </div>
           <div class="form-group">
             <label>Password</label>
-            <input type="password" id="newAccPassword" placeholder="Min. 8 chars (A-Z, a-z, 0-9)" autocomplete="new-password" required>
+            <div class="password-wrap">
+              <input type="password" id="newAccPassword" placeholder="Min. 8 chars (A-Z, a-z, 0-9)" autocomplete="new-password" required>
+              <button type="button" class="password-toggle" data-toggle-password="newAccPassword" aria-label="Show password" title="Show password">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
           </div>
           <div class="form-group">
             <label>Confirm Password</label>
-            <input type="password" id="newAccConfirm" placeholder="Confirm password" autocomplete="new-password" required>
+            <div class="password-wrap">
+              <input type="password" id="newAccConfirm" placeholder="Confirm password" autocomplete="new-password" required>
+              <button type="button" class="password-toggle" data-toggle-password="newAccConfirm" aria-label="Show password" title="Show password">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
           </div>
           <p class="modal-error" id="createAccountError"></p>
         </div>
@@ -3453,10 +3495,27 @@
         renderAdminUsers();
       }
 
+      function resetPasswordVisibility() {
+        document.querySelectorAll('#createAccountModal [data-toggle-password]').forEach((btn) => {
+          const input = document.getElementById(btn.getAttribute('data-toggle-password'));
+          if (input) input.type = 'password';
+          btn.setAttribute('aria-label', 'Show password');
+          btn.setAttribute('title', 'Show password');
+          const icon = btn.querySelector('i');
+          if (icon) {
+            icon.classList.add('fa-eye');
+            icon.classList.remove('fa-eye-slash');
+          }
+        });
+      }
+
+      window.gsoSupabase.bindPasswordToggles(document);
+
       function openCreateAccountModal() {
         if (!isAdmin || !createAccountModal) return;
         createAccountError.textContent = '';
         createAccountForm.reset();
+        resetPasswordVisibility();
         createAccountModal.classList.add('open');
       }
 

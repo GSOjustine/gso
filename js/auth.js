@@ -6,6 +6,10 @@
   let failedAttempts = 0;
   let lockoutUntil = 0;
 
+  if (window.gsoSupabase?.bindPasswordToggles) {
+    window.gsoSupabase.bindPasswordToggles(document);
+  }
+
   if (!loginForm) return;
 
   // If already signed in with an active profile, go directly to inventory
