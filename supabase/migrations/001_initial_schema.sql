@@ -373,6 +373,15 @@ grant select, insert, update, delete on public.ics_records to authenticated;
 grant select, insert, update, delete on public.par_records to authenticated;
 grant select on public.audit_logs to authenticated;
 
+grant usage on schema public to service_role;
+grant all on public.profiles to service_role;
+grant all on public.ics_records to service_role;
+grant all on public.par_records to service_role;
+grant all on public.audit_logs to service_role;
+grant usage, select on all sequences in schema public to service_role;
+grant usage on schema private to service_role;
+grant execute on all functions in schema private to service_role;
+
 -- PROFILES POLICIES
 drop policy if exists "Users see own profile or admin sees all" on public.profiles;
 create policy "Users see own profile or admin sees all"
