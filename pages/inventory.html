@@ -1,0 +1,3617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard · GSO Custodian</title>
+  <link rel="icon" type="image/jpeg" href="../gso.jpg">
+  <link rel="apple-touch-icon" href="../gso.jpg">
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Inter font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================================
+       RESET & ROOT — gradient blue theme, modern & organized
+    ============================================================ */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      /* gradient blue palette */
+      --brand-900: #0b2a4a;
+      --brand-800: #0e3a62;
+      --brand-700: #124a7a;
+      --brand-600: #1a5f96;
+      --brand-500: #2273b8;
+      --brand-400: #3a8bd4;
+      --brand-300: #6aaee6;
+      --brand-200: #a8cdf2;
+      --brand-100: #d6e8fc;
+      --brand-50: #eef6fe;
+
+      --bg: #f2f7fd;
+      --card: #ffffff;
+      --text: #0e2c4b;
+      --muted: #5c7c9e;
+      --border: #dce7f3;
+      --danger: #c93a3a;
+      --danger-dark: #a82e2e;
+
+      --radius-sm: 0.6rem;
+      --radius-md: 0.85rem;
+      --radius-lg: 1.1rem;
+      --radius-xl: 1.35rem;
+
+      --shadow-sm: 0 1px 3px rgba(11, 42, 74, 0.06);
+      --shadow-md: 0 8px 24px -10px rgba(11, 42, 74, 0.18);
+      --shadow-lg: 0 16px 40px -18px rgba(11, 42, 74, 0.28);
+      --shadow-glow: 0 4px 20px -6px rgba(34, 115, 184, 0.25);
+
+      --sidebar-width: 270px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ============================================================
+       APP LAYOUT
+    ============================================================ */
+    .app {
+      display: flex;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    /* ============================================================
+       SIDEBAR — gradient blue, sleek modern
+    ============================================================ */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: linear-gradient(155deg, #0b2a4a 0%, #0e3a62 40%, #124a7a 100%);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem 0.9rem 1.1rem 0.9rem;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      z-index: 50;
+      transform: translateX(-100%);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 6px 0 30px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+      backdrop-filter: blur(4px);
+      border-right: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .sidebar.open {
+      transform: translateX(0);
+    }
+
+    /* Overlay */
+    .sidebar-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(8, 28, 48, 0.55);
+      backdrop-filter: blur(3px);
+      z-index: 40;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.28s ease, visibility 0.28s ease;
+    }
+
+    .sidebar-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Sidebar brand */
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.3rem 0.5rem 1.5rem 0.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      margin-bottom: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .sidebar-brand i {
+      font-size: 1.5rem;
+      color: #d6e8fc;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 0.55rem;
+      border-radius: var(--radius-md);
+      width: 2.9rem;
+      text-align: center;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .sidebar-brand img {
+      width: 2.9rem;
+      height: 2.9rem;
+      border-radius: var(--radius-md);
+      object-fit: cover;
+      flex-shrink: 0;
+      background: #ffffff;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .sidebar-brand span {
+      font-weight: 700;
+      font-size: 1.2rem;
+      line-height: 1.2;
+      display: block;
+      white-space: nowrap;
+      letter-spacing: -0.02em;
+    }
+
+    .sidebar-brand small {
+      display: block;
+      font-size: 0.62rem;
+      opacity: 0.7;
+      font-weight: 400;
+      letter-spacing: 0.7px;
+      margin-top: 0.1rem;
+      white-space: nowrap;
+      text-transform: uppercase;
+    }
+
+    /* Sidebar date display */
+    .sidebar-date {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.7rem 0.9rem;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: var(--radius-sm);
+      margin-bottom: 1rem;
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      flex-shrink: 0;
+    }
+
+    .sidebar-date i {
+      color: #7ac7ff;
+      font-size: 0.9rem;
+    }
+
+    .sidebar-date span {
+      font-weight: 500;
+      letter-spacing: 0.2px;
+      white-space: nowrap;
+    }
+
+    /* Sidebar nav */
+    .sidebar-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding-right: 0.2rem;
+    }
+
+    .sidebar-nav::-webkit-scrollbar {
+      width: 4px;
+    }
+    .sidebar-nav::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.18);
+      border-radius: 4px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.8rem;
+      padding: 0.75rem 0.9rem;
+      border-radius: var(--radius-sm);
+      color: rgba(255, 255, 255, 0.72);
+      text-decoration: none;
+      font-size: 0.87rem;
+      font-weight: 500;
+      transition: all 0.18s ease;
+      cursor: pointer;
+      line-height: 1.4;
+      flex-shrink: 0;
+      border-left: 3px solid transparent;
+    }
+
+    .nav-item i {
+      font-size: 1rem;
+      width: 1.2rem;
+      text-align: center;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+      opacity: 0.9;
+    }
+
+    .nav-item span {
+      white-space: normal;
+      word-break: break-word;
+      line-height: 1.35;
+    }
+
+    .nav-item:hover {
+      background: rgba(255, 255, 255, 0.07);
+      color: white;
+      border-left-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .nav-item.active {
+      background: rgba(255, 255, 255, 0.13);
+      color: #ffffff;
+      font-weight: 600;
+      border-left-color: var(--brand-300);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+    }
+
+    .sidebar-footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 1rem;
+      margin-top: auto;
+      flex-shrink: 0;
+    }
+
+    /* ---- Red Logout button — prominent ---- */
+    .sidebar-footer .nav-item {
+      color: #ffffff;
+      background: #c93a3a;
+      border: 1px solid #dc4b4b;
+      border-left: 4px solid #8f1d1d;
+      font-weight: 600;
+    }
+
+    .sidebar-footer .nav-item i {
+      color: #ffffff;
+      opacity: 1;
+    }
+
+    .sidebar-footer .nav-item:hover {
+      background: #b82e2e;
+      color: #ffffff;
+      border-left-color: #7f1717;
+      box-shadow: 0 6px 18px rgba(201, 58, 58, 0.35);
+    }
+
+    /* Desktop collapsed sidebar: show only brand and navigation icons */
+    @media (min-width: 901px) {
+      .sidebar {
+        width: 76px;
+        padding: 1.2rem 0.75rem 1.1rem;
+        transform: translateX(0);
+        transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+                    padding 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .sidebar.open {
+        width: var(--sidebar-width);
+        padding: 1.5rem 0.9rem 1.1rem;
+      }
+
+      .sidebar-overlay {
+        display: none;
+      }
+
+      .main {
+        margin-left: 76px;
+        transition: margin-left 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .app.sidebar-open .main {
+        margin-left: var(--sidebar-width);
+      }
+
+      .sidebar-brand {
+        justify-content: center;
+        gap: 0;
+        padding: 0.3rem 0 1.2rem;
+        margin-bottom: 1.2rem;
+      }
+
+      .sidebar.open .sidebar-brand {
+        justify-content: flex-start;
+        gap: 0.8rem;
+        padding: 0.3rem 0.5rem 1.5rem;
+      }
+
+      .sidebar-brand img {
+        width: 46px;
+        height: 46px;
+      }
+
+      .sidebar-brand > div,
+      .sidebar-date,
+      .nav-item span {
+        display: none;
+      }
+
+      .sidebar.open .sidebar-brand > div,
+      .sidebar.open .nav-item span {
+        display: block;
+      }
+
+      .sidebar.open .sidebar-date {
+        display: flex;
+      }
+
+      .sidebar-nav {
+        align-items: center;
+        padding-right: 0;
+      }
+
+      .sidebar-nav::before {
+        content: "WORKSPACE";
+        align-self: flex-start;
+        margin: 0 0 0.55rem 0.8rem;
+        color: rgba(255, 255, 255, 0.48);
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+      }
+
+      .sidebar:not(.open) .sidebar-nav::before {
+        display: none;
+      }
+
+      .sidebar.open .sidebar-nav {
+        align-items: stretch;
+      }
+
+      .nav-item {
+        width: 48px;
+        min-height: 48px;
+        justify-content: center;
+        align-items: center;
+        gap: 0;
+        padding: 0.75rem;
+        border: 0;
+        border-radius: 12px;
+      }
+
+      .nav-item i {
+        margin: 0;
+        width: auto;
+        font-size: 1.05rem;
+      }
+
+      .nav-item.active {
+        background: rgba(255, 255, 255, 0.16);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+      }
+
+      .sidebar.open .nav-item {
+        width: 100%;
+        justify-content: flex-start;
+        align-items: flex-start;
+        gap: 0.8rem;
+        padding: 0.75rem 0.9rem;
+        border-left: 3px solid transparent;
+        border-radius: var(--radius-sm);
+      }
+
+      .sidebar.open .nav-item i {
+        margin-top: 0.1rem;
+        width: 1.2rem;
+      }
+
+      .sidebar-footer {
+        display: flex;
+        justify-content: center;
+      }
+
+      .sidebar-footer .nav-item {
+        border: 1px solid #dc4b4b;
+      }
+
+      .sidebar.open .sidebar-footer {
+        display: block;
+      }
+    }
+
+    /* ============================================================
+       MAIN
+    ============================================================ */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      width: 100%;
+      background: var(--bg);
+    }
+
+    /* ============================================================
+       TOPBAR — clean, modern, gradient accent
+    ============================================================ */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.9rem 1.9rem;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: 0 2px 14px rgba(11, 42, 74, 0.04);
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+    }
+
+    #menuToggle {
+      background: var(--brand-50);
+      border: 1px solid var(--border);
+      width: 42px;
+      height: 42px;
+      border-radius: var(--radius-md);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      color: var(--brand-700);
+      transition: all 0.18s;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    #menuToggle:hover {
+      background: var(--brand-100);
+      color: var(--brand-800);
+      border-color: var(--brand-200);
+      box-shadow: var(--shadow-glow);
+    }
+
+    #menuToggle:active {
+      transform: scale(0.95);
+    }
+
+    .topbar-left h1 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--brand-900);
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+    }
+
+    /* Topbar date */
+    .topbar-date {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.45rem 1rem;
+      background: var(--brand-50);
+      border: 1px solid var(--border);
+      border-radius: 2rem;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--brand-700);
+      white-space: nowrap;
+    }
+
+    .topbar-date i {
+      color: var(--brand-500);
+      font-size: 0.85rem;
+    }
+
+    .user-chip {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.3rem 1rem 0.3rem 0.35rem;
+      border-radius: 2.5rem;
+      background: var(--brand-50);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow 0.2s;
+    }
+
+    .user-chip:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--brand-500), var(--brand-700));
+      color: white;
+      display: grid;
+      place-items: center;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(34, 115, 184, 0.3);
+    }
+
+    .user-meta {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.2;
+    }
+
+    .user-name {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--brand-900);
+    }
+
+    .user-meta small {
+      font-size: 0.65rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    /* ============================================================
+       CONTENT — generous spacing, modern cards
+    ============================================================ */
+    .content {
+      padding: 2rem 2.2rem 2.5rem 2.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.8rem;
+      max-width: 1500px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* ============================================================
+       PANELS
+    ============================================================ */
+    .panel {
+      display: none;
+      flex-direction: column;
+      gap: 1.8rem;
+    }
+
+    .panel.active {
+      display: flex;
+      animation: panelFade 0.25s ease;
+    }
+
+    @keyframes panelFade {
+      0% { opacity: 0.5; transform: translateY(6px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ============================================================
+       STATS — gradient accents, elevated cards
+    ============================================================ */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border-radius: var(--radius-xl);
+      padding: 1.3rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      transition: all 0.25s cubic-bezier(0.2, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--brand-400), var(--brand-600));
+      opacity: 0.6;
+      transition: opacity 0.25s;
+    }
+
+    .stat-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .stat-card:hover::after {
+      opacity: 1;
+    }
+
+    .stat-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, var(--brand-100), var(--brand-200));
+      color: var(--brand-700);
+      display: grid;
+      place-items: center;
+      font-size: 1.15rem;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(34, 115, 184, 0.12);
+    }
+
+    .stat-icon.money {
+      background: linear-gradient(135deg, #e5f5e9, #c8e6c9);
+      color: #1e7e34;
+      box-shadow: 0 4px 12px rgba(30, 126, 52, 0.12);
+    }
+
+    .stat-body {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.3;
+      min-width: 0;
+    }
+
+    .stat-label {
+      font-size: 0.68rem;
+      color: var(--muted);
+      font-weight: 600;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      margin-bottom: 0.2rem;
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--brand-900);
+      letter-spacing: -0.02em;
+    }
+
+    .dashboard-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 0.15rem;
+    }
+
+    .dashboard-heading h2 {
+      color: var(--brand-900);
+      font-size: 1.45rem;
+      line-height: 1.2;
+      letter-spacing: -0.03em;
+    }
+
+    .dashboard-heading p {
+      margin-top: 0.35rem;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .dashboard-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.55rem 0.85rem;
+      border: 1px solid #bfe7cc;
+      border-radius: 999px;
+      background: #f2fbf5;
+      color: #217a3b;
+      font-size: 0.78rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .dashboard-status i {
+      font-size: 0.55rem;
+    }
+
+    .dashboard-shortcuts {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.25rem;
+    }
+
+    .shortcut-card {
+      width: 100%;
+      min-height: 128px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      background: var(--card);
+      padding: 1.35rem;
+      display: grid;
+      grid-template-columns: 52px minmax(0, 1fr) 36px;
+      align-items: center;
+      gap: 1rem;
+      text-align: left;
+      color: var(--text);
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
+      font-family: inherit;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    .shortcut-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--brand-200);
+      box-shadow: var(--shadow-md);
+    }
+
+    .shortcut-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: var(--brand-100);
+      color: var(--brand-700);
+      font-size: 1.15rem;
+    }
+
+    .shortcut-card[data-panel="parPanel"] .shortcut-icon {
+      background: #fff1df;
+      color: #9a5b12;
+    }
+
+    .shortcut-copy strong,
+    .shortcut-copy span {
+      display: block;
+    }
+
+    .shortcut-copy strong {
+      color: var(--brand-900);
+      font-size: 0.95rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .shortcut-copy span {
+      color: var(--muted);
+      font-size: 0.76rem;
+      line-height: 1.45;
+    }
+
+    .shortcut-arrow {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--brand-50);
+      color: var(--brand-600);
+    }
+
+    /* ============================================================
+       CARD — elevated, clean
+    ============================================================ */
+    .card {
+      background: var(--card);
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      transition: box-shadow 0.25s;
+    }
+
+    .inventory-card {
+      border: 1px solid #dde8f4;
+      border-radius: 18px;
+      box-shadow: 0 10px 32px rgba(11, 42, 74, 0.07);
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.3rem;
+      padding: 1.35rem 1.6rem;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      background: linear-gradient(135deg, #ffffff 0%, #f7faff 100%);
+    }
+
+    .inventory-card .card-header {
+      min-height: 98px;
+    }
+
+    .inventory-card .card-header > div:first-child {
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr);
+      column-gap: 0.8rem;
+      align-items: center;
+    }
+
+    .inventory-card .card-header > div:first-child::before {
+      content: "\f46c";
+      grid-row: 1 / span 2;
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--brand-600), var(--brand-400));
+      color: #ffffff;
+      font-family: "Font Awesome 6 Free";
+      font-weight: 900;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 8px 18px rgba(34, 115, 184, 0.18);
+    }
+
+    #parPanel .card-header > div:first-child::before {
+      content: "\f573";
+    }
+
+    .card-header h2 {
+      font-size: 1.12rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.15rem;
+      color: var(--brand-900);
+    }
+
+    .card-header p {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .card-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+    }
+
+    .inventory-card .card-actions {
+      justify-content: flex-end;
+    }
+
+    /* Search box — pill, modern */
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #ffffff;
+      border: 1px solid #d6e2ef;
+      border-radius: 10px;
+      padding: 0.58rem 0.85rem;
+      color: var(--muted);
+      transition: all 0.18s;
+      box-shadow: 0 2px 8px rgba(11, 42, 74, 0.03);
+    }
+
+    .search-box:focus-within {
+      border-color: var(--brand-400);
+      background: white;
+      box-shadow: 0 0 0 3px rgba(34, 115, 184, 0.1);
+    }
+
+    .search-box i {
+      font-size: 0.8rem;
+      color: var(--brand-500);
+    }
+
+    .search-box input {
+      border: none;
+      background: transparent;
+      outline: none;
+      font-family: inherit;
+      font-size: 0.8rem;
+      width: 170px;
+      color: var(--text);
+    }
+
+    .search-box input::placeholder {
+      color: #8faec8;
+    }
+
+    /* Buttons — modern, gradient primary */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: linear-gradient(135deg, var(--brand-600), var(--brand-800));
+      color: white;
+      border: none;
+      padding: 0.65rem 1.15rem;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+      box-shadow: 0 4px 14px -4px rgba(18, 74, 122, 0.4);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: linear-gradient(135deg, var(--brand-500), var(--brand-700));
+      box-shadow: 0 6px 20px -4px rgba(18, 74, 122, 0.5);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:active:not(:disabled) {
+      transform: scale(0.97);
+    }
+
+    .btn-primary:disabled,
+    .search-box input:disabled,
+    .page-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: white;
+      color: var(--brand-700);
+      border: 1px solid #cbdbea;
+      padding: 0.62rem 1.05rem;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s;
+      white-space: nowrap;
+    }
+
+    .btn-outline:hover {
+      background: var(--brand-50);
+      border-color: var(--brand-600);
+      box-shadow: 0 2px 10px rgba(34, 115, 184, 0.1);
+    }
+
+    .btn-outline:active {
+      transform: scale(0.97);
+    }
+
+    /* ============================================================
+       TABLE — airy, modern typography
+    ============================================================ */
+    .table-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-color: #b9cde2 #f5f8fc;
+      scrollbar-width: thin;
+    }
+
+    .table-wrap::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    .table-wrap::-webkit-scrollbar-track {
+      background: #f5f8fc;
+    }
+
+    .table-wrap::-webkit-scrollbar-thumb {
+      background: #c7d7e8;
+      border-radius: 999px;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.84rem;
+      min-width: 900px;
+    }
+
+    .data-table thead th {
+      text-align: left;
+      padding: 0.78rem 1.1rem;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      color: var(--muted);
+      background: linear-gradient(180deg, #f7faff, #f0f6fd);
+      border-bottom: 1px solid var(--border);
+      font-weight: 600;
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+    }
+
+    .data-table tbody td {
+      padding: 0.82rem 1.1rem;
+      border-bottom: 1px solid #edf3fa;
+      color: var(--text);
+      vertical-align: middle;
+    }
+
+    #icsPanel .data-table th:nth-child(1),
+    #icsPanel .data-table td:nth-child(1) {
+      width: 15%;
+      text-align: center;
+    }
+
+    #icsPanel .data-table th:nth-child(2),
+    #icsPanel .data-table td:nth-child(2) {
+      width: 8%;
+      text-align: center;
+    }
+
+    #parPanel .data-table th:nth-child(1),
+    #parPanel .data-table td:nth-child(1) {
+      width: 15%;
+      text-align: center;
+    }
+
+    #parPanel .data-table th:nth-child(2),
+    #parPanel .data-table td:nth-child(2) {
+      width: 8%;
+      text-align: center;
+    }
+
+    #icsPanel .data-table th:nth-child(4),
+    #icsPanel .data-table td:nth-child(4) {
+      width: 23%;
+      font-weight: 600;
+    }
+
+    #parPanel .data-table th:nth-child(4),
+    #parPanel .data-table td:nth-child(4) {
+      width: 23%;
+      font-weight: 600;
+    }
+
+    #icsPanel .data-table th:nth-child(7),
+    #icsPanel .data-table td:nth-child(7),
+    #parPanel .data-table th:nth-child(7),
+    #parPanel .data-table td:nth-child(7) {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+      color: var(--brand-800);
+    }
+
+    #icsPanel .data-table th:last-child,
+    #icsPanel .data-table td:last-child,
+    #parPanel .data-table th:last-child,
+    #parPanel .data-table td:last-child {
+      text-align: right;
+      width: 12%;
+    }
+
+    .data-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .data-table tbody tr:hover {
+      background: #f8fbff;
+      box-shadow: inset 3px 0 0 var(--brand-400);
+    }
+
+    .empty-row td {
+      padding: 0 !important;
+    }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 1.8rem;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .empty-state i {
+      font-size: 2.8rem;
+      color: var(--brand-200);
+      margin-bottom: 1rem;
+      opacity: 0.8;
+    }
+
+    .empty-state h3 {
+      font-size: 1rem;
+      color: var(--brand-800);
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+    }
+
+    .empty-state p {
+      font-size: 0.82rem;
+      max-width: 320px;
+      color: var(--muted);
+    }
+
+    /* Row action buttons — modern */
+    .row-actions {
+      display: flex;
+      gap: 0.4rem;
+    }
+
+    .row-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 0.5rem;
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--brand-600);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      font-size: 0.68rem;
+      transition: all 0.18s;
+    }
+
+    .row-btn[data-download] {
+      color: #1f7a3b;
+      background: #f1faf4;
+      border-color: #bee4c8;
+    }
+
+    .row-btn[data-edit] {
+      color: #1d70b7;
+      background: #eef6fd;
+      border-color: #bddaf3;
+    }
+
+    .row-btn.danger {
+      color: #c93a3a;
+      background: #fff2f2;
+      border-color: #f2c5c5;
+    }
+
+    .row-btn:hover {
+      background: var(--brand-50);
+      color: var(--brand-700);
+      border-color: var(--brand-300);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .row-btn.danger:hover {
+      background: #fdeded;
+      color: var(--danger);
+      border-color: #f5c7c7;
+    }
+
+    /* ============================================================
+       CARD FOOTER
+    ============================================================ */
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.95rem 1.8rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.75rem;
+      color: var(--muted);
+      background: linear-gradient(180deg, #fcfdff, #fafcff);
+      flex-wrap: wrap;
+      gap: 0.7rem;
+    }
+
+    .pagination {
+      display: flex;
+      gap: 0.4rem;
+    }
+
+    .page-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 0.55rem;
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--muted);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      font-size: 0.68rem;
+      transition: all 0.18s;
+    }
+
+    .page-btn:hover:not(:disabled) {
+      background: var(--brand-50);
+      color: var(--brand-700);
+      border-color: var(--brand-300);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* ============================================================
+       MODAL — polished, gradient overlay
+    ============================================================ */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(8, 28, 48, 0.55), rgba(11, 42, 74, 0.65));
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      z-index: 100;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .delete-confirm-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 120;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      background: rgba(8, 28, 48, 0.58);
+      backdrop-filter: blur(4px);
+    }
+
+    .delete-confirm-overlay.open {
+      display: flex;
+    }
+
+    .delete-confirm-dialog {
+      width: min(100%, 390px);
+      padding: 1.75rem;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      border-radius: 18px;
+      background: #ffffff;
+      box-shadow: 0 24px 70px rgba(6, 31, 57, 0.3);
+      animation: modalIn 0.2s cubic-bezier(0.2, 0, 0.2, 1);
+    }
+
+    .delete-confirm-dialog p {
+      margin: 0;
+      color: var(--brand-900);
+      font-size: 1.05rem;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .delete-confirm-actions {
+      display: flex;
+      justify-content: center;
+      gap: 0.7rem;
+      margin-top: 1.5rem;
+    }
+
+    .delete-confirm-actions .btn-secondary,
+    .delete-confirm-actions .btn-delete-confirm {
+      min-width: 100px;
+    }
+
+    .btn-delete-confirm {
+      padding: 0.6rem 1.2rem;
+      border: 1px solid #b82e2e;
+      border-radius: 2.5rem;
+      background: #c93a3a;
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.18s, transform 0.18s;
+    }
+
+    .btn-delete-confirm:hover {
+      background: #a82e2e;
+    }
+
+    .btn-delete-confirm:focus-visible,
+    .delete-confirm-actions .btn-secondary:focus-visible {
+      outline: 3px solid rgba(34, 115, 184, 0.35);
+      outline-offset: 2px;
+    }
+
+    .modal {
+      background: var(--card);
+      border-radius: var(--radius-xl);
+      width: 100%;
+      max-width: 680px;
+      max-height: 90vh;
+      overflow-y: auto;
+      overflow-x: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.75);
+      box-shadow: 0 24px 70px rgba(6, 31, 57, 0.28);
+      animation: modalIn 0.25s cubic-bezier(0.2, 0, 0.2, 1);
+    }
+
+    @keyframes modalIn {
+      0% { opacity: 0; transform: translateY(14px) scale(0.97); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 1.6rem;
+      border-bottom: 1px solid rgba(220, 231, 243, 0.9);
+      position: sticky;
+      top: 0;
+      background: linear-gradient(135deg, #ffffff 0%, #f4f8fd 100%);
+      z-index: 1;
+      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    }
+
+    .modal-header h3 {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      font-size: 1.12rem;
+      font-weight: 700;
+      color: var(--brand-900);
+    }
+
+    .modal-header h3::before {
+      content: "";
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--brand-600), var(--brand-400));
+      box-shadow: 0 8px 18px rgba(34, 115, 184, 0.22);
+    }
+
+    #icsModal .modal-header h3::before {
+      content: "\f46c";
+      font-family: "Font Awesome 6 Free";
+      font-weight: 900;
+      color: #ffffff;
+      display: grid;
+      place-items: center;
+      font-size: 0.9rem;
+    }
+
+    #parModal .modal-header h3::before {
+      content: "\f573";
+      font-family: "Font Awesome 6 Free";
+      font-weight: 900;
+      color: #ffffff;
+      display: grid;
+      place-items: center;
+      font-size: 0.9rem;
+    }
+
+    #createAccountModal .modal-header h3::before {
+      content: "\f234";
+      font-family: "Font Awesome 6 Free";
+      font-weight: 900;
+      color: #ffffff;
+      display: grid;
+      place-items: center;
+      font-size: 0.9rem;
+    }
+
+    #adminPanel .card-header > div:first-child::before {
+      content: "\f509";
+    }
+
+    .role-badge,
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: capitalize;
+    }
+
+    .role-badge.admin {
+      background: #eef6fd;
+      color: #124a7a;
+      border: 1px solid #bddaf3;
+    }
+
+    .role-badge.custodian {
+      background: #f4f7fb;
+      color: #46617d;
+      border: 1px solid #d6e2ef;
+    }
+
+    .status-badge.active {
+      background: #f1faf4;
+      color: #1f7a3b;
+      border: 1px solid #bee4c8;
+    }
+
+    .status-badge.inactive {
+      background: #fff2f2;
+      color: #c93a3a;
+      border: 1px solid #f2c5c5;
+    }
+
+    .modal-close {
+      background: transparent;
+      border: none;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      cursor: pointer;
+      color: var(--muted);
+      display: grid;
+      place-items: center;
+      font-size: 1rem;
+      transition: all 0.18s;
+      flex-shrink: 0;
+    }
+
+    .modal-close:hover {
+      background: var(--brand-50);
+      color: var(--brand-700);
+      transform: rotate(3deg);
+    }
+
+    .modal-body {
+      padding: 1.5rem 1.6rem 1.25rem;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem 1.2rem;
+      background:
+        linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)),
+        radial-gradient(circle at top right, var(--brand-100), transparent 38%);
+    }
+
+    .form-group-full,
+    .modal-error {
+      grid-column: 1 / -1;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .form-group label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--brand-800);
+    }
+
+    .form-group input,
+    .form-group select {
+      font-family: inherit;
+      padding: 0.7rem 1rem;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid #dbe5f0;
+      background: #fbfdff;
+      font-size: 0.84rem;
+      outline: none;
+      transition: all 0.18s;
+      width: 100%;
+      color: var(--text);
+      min-height: 44px;
+    }
+
+    .form-group input:hover,
+    .form-group select:hover {
+      border-color: #b9cde2;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: var(--brand-400);
+      box-shadow: 0 0 0 4px rgba(34, 115, 184, 0.1);
+      background: white;
+    }
+
+    .modal-error {
+      font-size: 0.74rem;
+      color: var(--danger);
+      min-height: 1.1rem;
+      font-weight: 500;
+      margin: 0;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.6rem;
+      padding: 1.3rem 1.8rem;
+      border-top: 1px solid var(--border);
+      background: linear-gradient(180deg, #fcfdff, #fafcff);
+      position: sticky;
+      bottom: 0;
+      border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+    }
+
+    @media (max-width: 600px) {
+      .modal-overlay {
+        align-items: flex-end;
+        padding: 0;
+      }
+
+      .modal {
+        max-width: none;
+        max-height: 92vh;
+        border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+      }
+
+      .modal-body {
+        grid-template-columns: 1fr;
+        padding: 1.2rem;
+      }
+
+      .modal-header {
+        padding: 1rem 1.2rem;
+        border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+      }
+
+      .modal-footer {
+        padding: 1rem 1.2rem;
+      }
+
+      .modal-footer .btn-secondary,
+      .modal-footer .btn-primary {
+        flex: 1;
+      }
+    }
+
+    .btn-secondary {
+      background: white;
+      color: var(--text);
+      border: 1.5px solid var(--border);
+      padding: 0.6rem 1.2rem;
+      border-radius: 2.5rem;
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s;
+    }
+
+    .btn-secondary:hover {
+      background: var(--brand-50);
+      border-color: var(--brand-300);
+    }
+
+    .btn-secondary:active {
+      transform: scale(0.97);
+    }
+
+    /* ============================================================
+       RESPONSIVE
+    ============================================================ */
+    @media (max-width: 1024px) {
+      .content {
+        padding: 1.5rem 1.6rem;
+      }
+      .topbar {
+        padding: 0.9rem 1.6rem;
+      }
+    }
+
+    @media (max-width: 780px) {
+      .topbar-date {
+        display: none;
+      }
+    }
+
+    @media (max-width: 640px) {
+      :root {
+        --sidebar-width: 250px;
+      }
+      .dashboard-heading {
+        align-items: flex-start;
+      }
+      .dashboard-status {
+        padding: 0.45rem 0.65rem;
+      }
+      .dashboard-shortcuts {
+        grid-template-columns: 1fr;
+        gap: 0.8rem;
+      }
+      .shortcut-card {
+        min-height: 112px;
+        padding: 1.1rem;
+      }
+      .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1.2rem 1.3rem;
+      }
+      .inventory-card .card-header {
+        min-height: auto;
+      }
+      .inventory-card .card-header > div:first-child {
+        grid-template-columns: 38px minmax(0, 1fr);
+      }
+      .inventory-card .card-header > div:first-child::before {
+        width: 38px;
+        height: 38px;
+      }
+      .card-actions {
+        width: 100%;
+      }
+      .search-box {
+        flex: 1;
+        min-width: 160px;
+      }
+      .search-box input {
+        width: 100%;
+      }
+      .user-meta {
+        display: none;
+      }
+      .user-chip {
+        padding: 0.3rem;
+      }
+      .topbar {
+        padding: 0.8rem 1.1rem;
+      }
+      .content {
+        padding: 1.1rem;
+        gap: 1.3rem;
+      }
+      .stats {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.8rem;
+      }
+      .stat-card {
+        padding: 1rem 1.1rem;
+        gap: 0.9rem;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .stat-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+      }
+      .stat-value {
+        font-size: 1.2rem;
+      }
+      .stat-label {
+        font-size: 0.62rem;
+      }
+      .card-footer {
+        padding: 0.85rem 1.3rem;
+      }
+      .modal-body {
+        padding: 1.3rem;
+      }
+      .modal-header {
+        padding: 1.1rem 1.3rem;
+      }
+      .modal-footer {
+        padding: 1rem 1.3rem;
+      }
+    }
+
+    @media (max-width: 400px) {
+      :root {
+        --sidebar-width: 230px;
+      }
+      .stats {
+        grid-template-columns: 1fr;
+      }
+      .card-actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .search-box {
+        width: 100%;
+      }
+      .btn-primary,
+      .btn-outline {
+        justify-content: center;
+      }
+    }
+
+    /* ============================================================
+       UTILITY
+    ============================================================ */
+    .text-muted { color: var(--muted); }
+    .fw-600 { font-weight: 600; }
+    .flex-1 { flex: 1; }
+  </style>
+</head>
+<body>
+  <div class="app">
+
+    <!-- ============ SIDEBAR OVERLAY ============ -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- ============ SIDEBAR ============ -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <img src="../gso.jpg" alt="GSO Logo">
+        <div>
+          <span>GSO</span>
+          <small>Custodian</small>
+        </div>
+      </div>
+
+      <!-- Full date in sidebar -->
+      <div class="sidebar-date">
+        <i class="fas fa-calendar-days"></i>
+        <span id="sidebarFullDate">—</span>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="Main navigation">
+        <a href="#" class="nav-item active" data-panel="dashboardPanel" data-title="Dashboard" title="Dashboard">
+          <i class="fas fa-gauge-high"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="#" class="nav-item" data-panel="icsPanel" data-title="Inventory Custodian Slip" title="Inventory Custodian Slip">
+          <i class="fas fa-file-invoice"></i>
+          <span>Inventory Custodian Slip</span>
+        </a>
+        <a href="#" class="nav-item" data-panel="parPanel" data-title="Property Acknowledge Receipt" title="Property Acknowledge Receipt">
+          <i class="fas fa-file-signature"></i>
+          <span>Property Acknowledge Receipt</span>
+        </a>
+        <a href="#" class="nav-item" id="adminNavItem" data-panel="adminPanel" data-title="User Accounts" title="User Accounts" style="display:none;">
+          <i class="fas fa-users-cog"></i>
+          <span>User Accounts</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="../index.html" class="nav-item" id="logoutLink" title="Log out">
+          <i class="fas fa-arrow-right-from-bracket"></i>
+          <span>Log out</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- ============ MAIN ============ -->
+    <div class="main">
+
+      <!-- TOPBAR -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-btn" id="menuToggle" aria-label="Toggle sidebar" title="Toggle sidebar">
+            <i class="fas fa-bars"></i>
+          </button>
+          <h1 id="pageTitle">Dashboard</h1>
+        </div>
+        <div class="topbar-right">
+          <!-- Full date in topbar -->
+          <div class="topbar-date">
+            <i class="fas fa-calendar-days"></i>
+            <span id="topbarFullDate">—</span>
+          </div>
+          <div class="user-chip">
+            <div class="avatar"><i class="fas fa-user"></i></div>
+            <div class="user-meta">
+              <span class="user-name" id="userName">—</span>
+              <small id="userRoleLabel">Custodian</small>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- CONTENT -->
+      <main class="content">
+
+        <!-- ============ DASHBOARD PANEL ============ -->
+        <div class="panel active" id="dashboardPanel">
+
+          <section class="dashboard-heading">
+            <div>
+              <h2>Inventory Overview</h2>
+              <p>Monitor and manage your custodian records.</p>
+            </div>
+            <div class="dashboard-status">
+              <i class="fas fa-circle"></i>
+              <span>System Ready</span>
+            </div>
+          </section>
+
+          <!-- STATS -->
+          <section class="stats">
+            <div class="stat-card">
+              <div class="stat-icon"><i class="fas fa-box"></i></div>
+              <div class="stat-body">
+                <span class="stat-label">Total Items</span>
+                <span class="stat-value" id="statTotalItems">0</span>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon"><i class="fas fa-file-invoice"></i></div>
+              <div class="stat-body">
+                <span class="stat-label">ICS Records</span>
+                <span class="stat-value" id="statIcsCount">0</span>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon"><i class="fas fa-file-signature"></i></div>
+              <div class="stat-body">
+                <span class="stat-label">PAR Records</span>
+                <span class="stat-value" id="statParCount">0</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="dashboard-shortcuts" aria-label="Inventory shortcuts">
+            <button class="shortcut-card" type="button" data-panel="icsPanel" data-title="Inventory Custodian Slip">
+              <span class="shortcut-icon"><i class="fas fa-file-invoice"></i></span>
+              <span class="shortcut-copy">
+                <strong>Inventory Custodian Slip</strong>
+                <span>View, add, and manage ICS records</span>
+              </span>
+              <span class="shortcut-arrow"><i class="fas fa-arrow-right"></i></span>
+            </button>
+            <button class="shortcut-card" type="button" data-panel="parPanel" data-title="Property Acknowledge Receipt">
+              <span class="shortcut-icon"><i class="fas fa-file-signature"></i></span>
+              <span class="shortcut-copy">
+                <strong>Property Acknowledge Receipt</strong>
+                <span>View, add, and manage PAR records</span>
+              </span>
+              <span class="shortcut-arrow"><i class="fas fa-arrow-right"></i></span>
+            </button>
+          </section>
+
+        </div>
+
+        <!-- ============ INVENTORY CUSTODIAN SLIP PANEL ============ -->
+        <div class="panel" id="icsPanel">
+          <section class="card inventory-card">
+            <div class="card-header">
+              <div>
+                <h2>Inventory Custodian Slip</h2>
+                <p>Manage ICS records</p>
+              </div>
+              <div class="card-actions">
+                <div class="search-box">
+                  <i class="fas fa-search"></i>
+                  <input type="text" id="icsSearch" placeholder="Search ICS…">
+                </div>
+                <button class="btn-outline" id="btnExportICS">
+                  <i class="fas fa-download"></i> Download ICS Document
+                </button>
+                <button class="btn-primary" id="btnNewICS">
+                  <i class="fas fa-plus"></i> New ICS
+                </button>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>ICS No.</th>
+                    <th>Quantity</th>
+                    <th>Unit</th>
+                    <th>Description</th>
+                    <th>Inventory Item No.</th>
+                    <th>Estimated Useful Life</th>
+                    <th>Price</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="icsTableBody">
+                  <!-- rows injected by JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <div class="card-footer">
+              <span id="icsFooterInfo">Showing 0 of 0 entries</span>
+              <div class="pagination">
+                <button class="page-btn" disabled><i class="fas fa-chevron-left"></i></button>
+                <button class="page-btn" disabled><i class="fas fa-chevron-right"></i></button>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- ============ PROPERTY ACKNOWLEDGE RECEIPT PANEL ============ -->
+        <div class="panel" id="parPanel">
+          <section class="card inventory-card">
+            <div class="card-header">
+              <div>
+                <h2>Property Acknowledge Receipt</h2>
+                <p>Manage PAR records</p>
+              </div>
+              <div class="card-actions">
+                <div class="search-box">
+                  <i class="fas fa-search"></i>
+                  <input type="text" id="parSearch" placeholder="Search PAR…">
+                </div>
+                <button class="btn-outline" id="btnExportPAR">
+                  <i class="fas fa-download"></i> Download PAR Document
+                </button>
+                <button class="btn-primary" id="btnNewPAR">
+                  <i class="fas fa-plus"></i> New PAR
+                </button>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>PAR No.</th>
+                    <th>Quantity</th>
+                    <th>Unit</th>
+                    <th>Description</th>
+                    <th>Property Number</th>
+                    <th>Date Acquired</th>
+                    <th>Amount</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="parTableBody">
+                  <!-- rows injected by JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <div class="card-footer">
+              <span id="parFooterInfo">Showing 0 of 0 entries</span>
+              <div class="pagination">
+                <button class="page-btn" disabled><i class="fas fa-chevron-left"></i></button>
+                <button class="page-btn" disabled><i class="fas fa-chevron-right"></i></button>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- ============ ADMIN USER ACCOUNTS PANEL ============ -->
+        <div class="panel" id="adminPanel">
+          <section class="card inventory-card">
+            <div class="card-header">
+              <div>
+                <h2>User Accounts</h2>
+                <p>Admin account provisioning &amp; access control</p>
+              </div>
+              <div class="card-actions">
+                <div class="search-box">
+                  <i class="fas fa-search"></i>
+                  <input type="text" id="adminUserSearch" placeholder="Search users…">
+                </div>
+                <button class="btn-primary" id="btnCreateAccount" type="button">
+                  <i class="fas fa-user-plus"></i> Create Account
+                </button>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminUsersTableBody">
+                  <!-- rows injected by JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <div class="card-footer">
+              <span id="adminUsersFooterInfo">Showing 0 of 0 accounts</span>
+            </div>
+          </section>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ============ ICS MODAL ============ -->
+  <div class="modal-overlay" id="icsModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="icsModalTitle">New ICS Record</h3>
+        <button class="modal-close" data-close="icsModal"><i class="fas fa-xmark"></i></button>
+      </div>
+      <form id="icsForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Quantity</label>
+            <input type="number" id="icsQty" min="1" placeholder="e.g. 5" required>
+          </div>
+          <div class="form-group">
+            <label>Unit</label>
+            <input type="text" id="icsUnit" placeholder="e.g. pcs, box, set" required>
+          </div>
+          <div class="form-group form-group-full">
+            <label>Description</label>
+            <input type="text" id="icsDesc" placeholder="e.g. Laptop, Office Chair" required>
+          </div>
+          <div class="form-group">
+            <label>Inventory Item No.</label>
+            <input type="text" id="icsItemNo" placeholder="e.g. INV-2025-001" required>
+          </div>
+          <div class="form-group">
+            <label>Estimated Useful Life</label>
+            <input type="text" id="icsLife" placeholder="e.g. 5 years" required>
+          </div>
+          <div class="form-group">
+            <label>Price (₱)</label>
+            <input type="number" id="icsPrice" min="0" step="0.01" placeholder="e.g. 25000.00" required>
+          </div>
+          <p class="modal-error" id="icsError"></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" data-close="icsModal">Cancel</button>
+          <button type="submit" class="btn-primary"><i class="fas fa-floppy-disk"></i> Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============ PAR MODAL ============ -->
+  <div class="modal-overlay" id="parModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="parModalTitle">New PAR Record</h3>
+        <button class="modal-close" data-close="parModal"><i class="fas fa-xmark"></i></button>
+      </div>
+      <form id="parForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Quantity</label>
+            <input type="number" id="parQty" min="1" placeholder="e.g. 5" required>
+          </div>
+          <div class="form-group">
+            <label>Unit</label>
+            <input type="text" id="parUnit" placeholder="e.g. pcs, box, set" required>
+          </div>
+          <div class="form-group form-group-full">
+            <label>Description</label>
+            <input type="text" id="parDesc" placeholder="e.g. Laptop, Office Chair" required>
+          </div>
+          <div class="form-group">
+            <label>Property Number</label>
+            <input type="text" id="parPropNo" placeholder="e.g. PROP-2025-001" required>
+          </div>
+          <div class="form-group">
+            <label>Date Acquired</label>
+            <input type="date" id="parDate" required>
+          </div>
+          <div class="form-group">
+            <label>Amount (₱)</label>
+            <input type="number" id="parAmount" min="0" step="0.01" placeholder="e.g. 25000.00" required>
+          </div>
+          <p class="modal-error" id="parError"></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" data-close="parModal">Cancel</button>
+          <button type="submit" class="btn-primary"><i class="fas fa-floppy-disk"></i> Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============ ADMIN CREATE ACCOUNT MODAL ============ -->
+  <div class="modal-overlay" id="createAccountModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Create Custodian Account</h3>
+        <button class="modal-close" data-close="createAccountModal" type="button"><i class="fas fa-xmark"></i></button>
+      </div>
+      <form id="createAccountForm" novalidate>
+        <div class="modal-body">
+          <div class="form-group form-group-full">
+            <label>Full Name</label>
+            <input type="text" id="newAccName" placeholder="e.g. Juan Dela Cruz" maxlength="120" required>
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="newAccEmail" placeholder="custodian@gso.gov" maxlength="254" required>
+          </div>
+          <div class="form-group">
+            <label>Role</label>
+            <select id="newAccRole" required>
+              <option value="custodian">Custodian</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="newAccPassword" placeholder="Min. 8 chars (A-Z, a-z, 0-9)" autocomplete="new-password" required>
+          </div>
+          <div class="form-group">
+            <label>Confirm Password</label>
+            <input type="password" id="newAccConfirm" placeholder="Confirm password" autocomplete="new-password" required>
+          </div>
+          <p class="modal-error" id="createAccountError"></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" data-close="createAccountModal">Cancel</button>
+          <button type="submit" class="btn-primary" id="btnSubmitCreateAccount"><i class="fas fa-user-plus"></i> Create Account</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="delete-confirm-overlay" id="deleteConfirmOverlay" aria-hidden="true">
+    <div class="delete-confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby="deleteConfirmMessage" tabindex="-1">
+      <p id="deleteConfirmMessage">Delete this PAR record?</p>
+      <div class="delete-confirm-actions">
+        <button type="button" class="btn-secondary" id="deleteConfirmCancel">Cancel</button>
+        <button type="button" class="btn-delete-confirm" id="deleteConfirmButton">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SCRIPT ============ -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js" crossorigin="anonymous"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script>
+    (async function () {
+      document.documentElement.style.visibility = 'hidden';
+
+      let authCtx = null;
+      try {
+        authCtx = await window.gsoSupabase.getAuthenticatedUserContext();
+      } catch {
+        authCtx = null;
+      }
+
+      if (!authCtx) {
+        window.location.replace('../index.html');
+        return;
+      }
+
+      document.documentElement.style.visibility = 'visible';
+
+      const supabaseClient = authCtx.client;
+      const currentUser = authCtx.user;
+      const currentProfile = authCtx.profile;
+      const isAdmin = authCtx.role === 'admin';
+
+      // Show logged-in user's name and role
+      const userNameEl = document.getElementById('userName');
+      const userRoleEl = document.getElementById('userRoleLabel');
+      if (userNameEl) userNameEl.textContent = currentProfile.full_name || 'Custodian';
+      if (userRoleEl) userRoleEl.textContent = isAdmin ? 'Admin' : 'Custodian';
+
+      const adminNavItem = document.getElementById('adminNavItem');
+      if (adminNavItem && isAdmin) {
+        adminNavItem.style.display = '';
+      }
+
+      // ============ FULL DATE DISPLAY ============
+      function updateDateDisplay() {
+        const now = new Date();
+        const options = {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        };
+        const dateStr = now.toLocaleDateString('en-US', options);
+        const sidebarDate = document.getElementById('sidebarFullDate');
+        const topbarDate = document.getElementById('topbarFullDate');
+        if (sidebarDate) sidebarDate.textContent = dateStr;
+        if (topbarDate) topbarDate.textContent = dateStr;
+      }
+      updateDateDisplay();
+      setInterval(updateDateDisplay, 60000);
+
+      // ============ HELPERS ============
+      async function getFreshAccessToken() {
+        const { data } = await supabaseClient.auth.getSession();
+        return data?.session?.access_token || '';
+      }
+
+      function esc(str) {
+        return String(str ?? '').replace(/[&<>"']/g, (m) => ({
+          '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        }[m]));
+      }
+
+      function formatCurrency(n) {
+        const num = Number(n) || 0;
+        return '₱' + num.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+
+      function formatCurrencyDoc(n) {
+        const num = Number(n) || 0;
+        return num.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+
+      function sanitizeFilePart(str) {
+        return String(str || 'record').replace(/[^a-zA-Z0-9_-]+/g, '_').slice(0, 60) || 'record';
+      }
+
+      // ============================================================
+      // SIDEBAR TOGGLE
+      // ============================================================
+      const menuToggle = document.getElementById('menuToggle');
+      const sidebar = document.getElementById('sidebar');
+      const sidebarOverlay = document.getElementById('sidebarOverlay');
+      const app = document.querySelector('.app');
+
+      function openSidebar() {
+        sidebar.classList.add('open');
+        if (app) app.classList.add('sidebar-open');
+        if (window.innerWidth <= 900) {
+          sidebarOverlay.classList.add('active');
+          document.body.style.overflow = 'hidden';
+        }
+      }
+
+      function closeSidebar() {
+        sidebar.classList.remove('open');
+        if (app) app.classList.remove('sidebar-open');
+        if (window.innerWidth <= 900) {
+          sidebarOverlay.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      }
+
+      function toggleSidebar() {
+        if (sidebar.classList.contains('open')) {
+          closeSidebar();
+        } else {
+          openSidebar();
+        }
+      }
+
+      if (menuToggle) {
+        menuToggle.addEventListener('click', (e) => {
+          e.stopPropagation();
+          toggleSidebar();
+        });
+      }
+
+      if (sidebarOverlay) {
+        sidebarOverlay.addEventListener('click', closeSidebar);
+      }
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && sidebar.classList.contains('open')) {
+          closeSidebar();
+        }
+      });
+
+      // ============ NAV → PANEL SWITCHING ============
+      const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
+      const panels = document.querySelectorAll('.panel');
+      const pageTitle = document.getElementById('pageTitle');
+
+      navItems.forEach((item) => {
+        item.addEventListener('click', (e) => {
+          e.preventDefault();
+
+          navItems.forEach((n) => n.classList.remove('active'));
+          item.classList.add('active');
+
+          panels.forEach((p) => p.classList.remove('active'));
+          const panelId = item.getAttribute('data-panel');
+          const title = item.getAttribute('data-title');
+          const panelEl = document.getElementById(panelId);
+          if (panelEl) panelEl.classList.add('active');
+          if (pageTitle) pageTitle.textContent = title;
+
+          if (window.innerWidth <= 900) {
+            closeSidebar();
+          }
+        });
+      });
+
+      document.querySelectorAll('.dashboard-shortcuts .shortcut-card').forEach((button) => {
+        button.addEventListener('click', () => {
+          const panelId = button.getAttribute('data-panel');
+          const matchingNav = Array.from(navItems).find(
+            (item) => item.getAttribute('data-panel') === panelId
+          );
+          if (matchingNav) matchingNav.click();
+        });
+      });
+
+      // ============ LOGOUT ============
+      const logoutLink = document.getElementById('logoutLink');
+      if (logoutLink) {
+        logoutLink.addEventListener('click', async (e) => {
+          e.preventDefault();
+          await supabaseClient.auth.signOut().catch(() => {});
+          window.location.replace('../index.html');
+        });
+      }
+
+      // ============================================================
+      // ICS MODULE (SUPABASE POSTGRES)
+      // ============================================================
+      const icsTableBody = document.getElementById('icsTableBody');
+      const icsSearch = document.getElementById('icsSearch');
+      const icsFooterInfo = document.getElementById('icsFooterInfo');
+      const icsModal = document.getElementById('icsModal');
+      const icsForm = document.getElementById('icsForm');
+      const icsModalTitle = document.getElementById('icsModalTitle');
+      const icsError = document.getElementById('icsError');
+      const btnExportICS = document.getElementById('btnExportICS');
+
+      let icsRecords = [];
+      let icsEditingId = null;
+
+      function mapIcsRow(row) {
+        return {
+          id: row.id,
+          icsNo: row.ics_no,
+          qty: row.qty,
+          unit: row.unit,
+          desc: row.description,
+          itemNo: row.item_no,
+          life: row.estimated_useful_life,
+          price: row.price
+        };
+      }
+
+      async function fetchICS() {
+        const { data, error } = await supabaseClient
+          .from('ics_records')
+          .select('id, ics_no, qty, unit, description, item_no, estimated_useful_life, price, created_at')
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          icsRecords = [];
+          return;
+        }
+        icsRecords = (data || []).map(mapIcsRow);
+      }
+
+      function getFilteredICS() {
+        const q = icsSearch.value.trim().toLowerCase();
+        if (!q) return icsRecords;
+        return icsRecords.filter((r) =>
+          [r.icsNo, r.qty, r.unit, r.desc, r.itemNo, r.life, r.price]
+            .join(' ').toLowerCase().includes(q)
+        );
+      }
+
+      function renderICS() {
+        const filtered = getFilteredICS();
+        icsTableBody.innerHTML = '';
+
+        if (filtered.length === 0) {
+          icsTableBody.innerHTML = `
+            <tr class="empty-row">
+              <td colspan="8">
+                <div class="empty-state">
+                  <i class="fas fa-file-invoice"></i>
+                  <h3>${icsRecords.length === 0 ? 'No ICS records yet' : 'No matching records'}</h3>
+                  <p>${icsRecords.length === 0
+                    ? 'Inventory Custodian Slips will appear here once created.'
+                    : 'Try a different search term.'}</p>
+                </div>
+              </td>
+            </tr>`;
+        } else {
+          filtered.forEach((r) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${esc(r.icsNo || '')}</td>
+              <td>${esc(r.qty)}</td>
+              <td>${esc(r.unit)}</td>
+              <td>${esc(r.desc)}</td>
+              <td>${esc(r.itemNo)}</td>
+              <td>${esc(r.life)}</td>
+              <td>${formatCurrency(r.price)}</td>
+              <td>
+                <div class="row-actions">
+                  <button class="row-btn" data-download="${r.id}" title="Download"><i class="fas fa-download"></i></button>
+                  <button class="row-btn" data-edit="${r.id}" title="Edit"><i class="fas fa-pen"></i></button>
+                  <button class="row-btn danger" data-delete="${r.id}" title="Delete"><i class="fas fa-trash"></i></button>
+                </div>
+              </td>`;
+            icsTableBody.appendChild(tr);
+          });
+        }
+
+        icsFooterInfo.textContent = `Showing ${filtered.length} of ${icsRecords.length} entries`;
+        updateStats();
+      }
+
+      function openICSModal(record) {
+        icsError.textContent = '';
+        if (record) {
+          icsEditingId = record.id;
+          icsModalTitle.textContent = 'Edit ICS Record';
+          document.getElementById('icsQty').value = record.qty;
+          document.getElementById('icsUnit').value = record.unit;
+          document.getElementById('icsDesc').value = record.desc;
+          document.getElementById('icsItemNo').value = record.itemNo;
+          document.getElementById('icsLife').value = record.life;
+          document.getElementById('icsPrice').value = record.price;
+        } else {
+          icsEditingId = null;
+          icsModalTitle.textContent = 'New ICS Record';
+          icsForm.reset();
+        }
+        icsModal.classList.add('open');
+      }
+
+      function closeICSModal() {
+        icsModal.classList.remove('open');
+      }
+
+      document.getElementById('btnNewICS').addEventListener('click', () => openICSModal(null));
+      icsSearch.addEventListener('input', renderICS);
+
+      icsForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        icsError.textContent = '';
+
+        const qty = document.getElementById('icsQty').value.trim();
+        const unit = document.getElementById('icsUnit').value.trim();
+        const desc = document.getElementById('icsDesc').value.trim();
+        const itemNo = document.getElementById('icsItemNo').value.trim();
+        const life = document.getElementById('icsLife').value.trim();
+        const price = document.getElementById('icsPrice').value.trim();
+
+        if (!qty || !unit || !desc || !itemNo || !life || !price) {
+          icsError.textContent = 'Please fill in all fields.';
+          return;
+        }
+        if (Number(qty) < 1 || !Number.isInteger(Number(qty))) {
+          icsError.textContent = 'Quantity must be a whole number of at least 1.';
+          return;
+        }
+        if (Number(price) < 0 || !Number.isFinite(Number(price))) {
+          icsError.textContent = 'Price cannot be negative.';
+          return;
+        }
+
+        const saveBtn = icsForm.querySelector('button[type="submit"]');
+        if (saveBtn) saveBtn.disabled = true;
+
+        try {
+          let err = null;
+          if (icsEditingId) {
+            const res = await supabaseClient
+              .from('ics_records')
+              .update({
+                qty: Number(qty),
+                unit: unit.slice(0, 50),
+                description: desc.slice(0, 500),
+                item_no: itemNo.slice(0, 100),
+                estimated_useful_life: life.slice(0, 100),
+                price: Number(price),
+                updated_by: currentUser.id
+              })
+              .eq('id', icsEditingId);
+            err = res.error;
+          } else {
+            const res = await supabaseClient
+              .from('ics_records')
+              .insert({
+                qty: Number(qty),
+                unit: unit.slice(0, 50),
+                description: desc.slice(0, 500),
+                item_no: itemNo.slice(0, 100),
+                estimated_useful_life: life.slice(0, 100),
+                price: Number(price),
+                created_by: currentUser.id,
+                updated_by: currentUser.id
+              });
+            err = res.error;
+          }
+
+          if (err) {
+            icsError.textContent = 'Unable to save ICS record. Please check your input.';
+            return;
+          }
+
+          await fetchICS();
+          renderICS();
+          closeICSModal();
+        } finally {
+          if (saveBtn) saveBtn.disabled = false;
+        }
+      });
+
+      icsTableBody.addEventListener('click', (e) => {
+        const editBtn = e.target.closest('[data-edit]');
+        const delBtn = e.target.closest('[data-delete]');
+        const downloadBtn = e.target.closest('[data-download]');
+
+        if (editBtn) {
+          const id = editBtn.getAttribute('data-edit');
+          const rec = icsRecords.find((r) => r.id === id);
+          if (rec) openICSModal(rec);
+        }
+
+        if (delBtn) {
+          const id = delBtn.getAttribute('data-delete');
+          openDeleteConfirmation(id, delBtn, 'ICS');
+        }
+
+        if (downloadBtn) {
+          const id = downloadBtn.getAttribute('data-download');
+          const rec = icsRecords.find((r) => r.id === id);
+          if (rec) downloadSingleICS(rec);
+        }
+      });
+
+      // ============================================================
+      // DOWNLOAD SINGLE ICS RECORD
+      // ============================================================
+      function downloadSingleICS(record) {
+        const html = buildICSDocumentHTML([record]);
+        const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+        const url = URL.createObjectURL(blob);
+
+        const fileName = `Inventory_Custodian_Slip_${sanitizeFilePart(record.itemNo)}.doc`;
+
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        setTimeout(() => URL.revokeObjectURL(url), 1500);
+      }
+
+      // ============================================================
+      // ICS DOWNLOAD AS WORD DOCUMENT (ONE SLIP PER PAGE)
+      // ============================================================
+      function buildICSDocumentHTML(records) {
+        // Build one complete ICS slip per record, separated by page breaks
+        const slipsHtml = records.map((r) => {
+          const desc = esc(r.desc).replace(/\n/g, '<br>');
+
+          return `
+            <div class="ics-slip">
+              <div class="doc-header">
+                <p>Republic of the Philippines</p>
+                <p class="doc-province">Province of Cagayan</p>
+                <p class="doc-agency">MUNICIPALITY OF SANTA ANA</p>
+                <p>CAGAYAN</p>
+              </div>
+
+              <table class="main-container">
+                <tr>
+                  <td>
+                    <div class="doc-title">INVENTORY CUSTODIAN SLIP</div>
+                    <div style="height: 14pt; line-height: 14pt;">&nbsp;</div>
+                    <div style="height: 14pt; line-height: 14pt;">&nbsp;</div>
+                    <div class="doc-icsno">ICS No.: ${esc(r.icsNo || '')}</div>
+
+                    <table class="items-table">
+                      <thead>
+                        <tr>
+                          <th style="width:9%;">Quantity</th>
+                          <th style="width:8%;">Unit</th>
+                          <th style="width:46%;">Description</th>
+                          <th style="width:15%;">Inventory<br>Item No.</th>
+                          <th style="width:14%;">Estimated<br>Useful Life</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td style="border:1px solid #000; text-align:center; width:9%; padding:4px; vertical-align:top;">${esc(r.qty)}</td>
+                          <td style="border:1px solid #000; text-align:center; width:8%; padding:4px; vertical-align:top;">${esc(r.unit)}</td>
+                          <td style="border:1px solid #000; width:46%; padding:4px; vertical-align:top;">
+                            <div style="font-weight:bold;">${desc}</div>
+                            <div style="margin-top: 8px;">${formatCurrencyDoc(r.price)}</div>
+                          </td>
+                          <td style="border:1px solid #000; text-align:center; width:15%; padding:4px; vertical-align:top;">${esc(r.itemNo)}</td>
+                          <td style="border:1px solid #000; text-align:center; width:14%; padding:4px; vertical-align:top;">${esc(r.life)}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+
+                    <table class="sig-table">
+                      <tr>
+                        <td>
+                          <div class="sig-label">Received by:</div>
+                          <div class="sig-name">ERMALYN M. SAMORTIN</div>
+                          <div class="sig-sub">Signature Over Printed Name</div>
+                          <div class="sig-position">Ticket Checker / Treasury Office</div>
+                          <div class="sig-position-sub">Position/Office</div>
+                          <div class="sig-date">Date</div>
+                        </td>
+                        <td>
+                          <div class="sig-label">Received from:</div>
+                          <div class="sig-name">RELITO V. BAUTISTA</div>
+                          <div class="sig-sub">Signature Over Printed Name</div>
+                          <div class="sig-position">Supply Officer II/GSO</div>
+                          <div class="sig-position-sub">Position/Office</div>
+                          <div class="sig-date">Date</div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </div>`;
+        }).join('<br clear="all" style="mso-special-character:line-break;page-break-before:always">');
+
+        return `
+          <html xmlns:o="urn:schemas-microsoft-com:office:office"
+                xmlns:w="urn:schemas-microsoft-com:office:word"
+                xmlns="http://www.w3.org/TR/REC-html40">
+          <head>
+            <meta charset="utf-8">
+            <title>Inventory Custodian Slip</title>
+            <!--[if gte mso 9]>
+            <xml>
+              <w:WordDocument>
+                <w:View>Print</w:View>
+                <w:Zoom>100</w:Zoom>
+                <w:DoNotOptimizeForBrowser/>
+              </w:WordDocument>
+            </xml>
+            <![endif]-->
+            <style>
+              @page {
+                size: 21.59cm 27.94cm;
+                margin: 1.5cm 1.8cm 1.5cm 1.8cm;
+              }
+              body {
+                font-family: 'Times New Roman', Times, serif;
+                font-size: 11pt;
+                color: #000;
+                line-height: 1.2;
+              }
+              .doc-header { text-align: center; margin-bottom: 20px; }
+              .doc-header p { font-size: 11pt; margin: 0; line-height: 1.3; }
+              .doc-header .doc-agency { font-weight: bold; font-size: 12pt; }
+              .doc-header .doc-province { font-size: 11pt; }
+
+              table.main-container {
+                width: 100%;
+                border-collapse: collapse;
+                border: 2px solid #000;
+              }
+
+              .doc-title {
+                text-align: center;
+                font-size: 20pt;
+                font-weight: bold;
+                letter-spacing: 1px;
+                padding: 10px;
+              }
+
+              .doc-icsno {
+                text-align: right;
+                font-size: 10pt;
+                padding: 2px 8px;
+                border-bottom: 2px solid #000;
+              }
+
+              table.items-table {
+                width: 100%;
+                border-collapse: collapse;
+              }
+              table.items-table th {
+                border: 1px solid #000;
+                border-top: none;
+                padding: 6px;
+                font-size: 11pt;
+                text-align: center;
+                font-weight: bold;
+                vertical-align: top;
+              }
+              table.items-table td {
+                font-size: 11pt;
+              }
+
+              table.sig-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+              }
+              table.sig-table td {
+                width: 50%;
+                vertical-align: top;
+                padding: 10px 15px;
+                font-size: 11pt;
+              }
+              .sig-label { font-size: 11pt; margin-bottom: 45px; }
+              .sig-name {
+                font-weight: bold;
+                text-decoration: underline;
+                text-transform: uppercase;
+                font-size: 11pt;
+              }
+              .sig-sub { font-size: 10.5pt; }
+              .sig-position {
+                margin-top: 25px;
+                font-weight: bold;
+                text-decoration: underline;
+                font-size: 11pt;
+              }
+              .sig-position-sub { font-size: 10.5pt; margin-bottom: 25px; }
+              .sig-date {
+                border-top: 1px solid #000;
+                width: 50%;
+                margin: 0 auto;
+                text-align: center;
+                font-size: 10pt;
+                padding-top: 2px;
+              }
+            </style>
+          </head>
+          <body>
+            ${slipsHtml}
+          </body>
+          </html>`;
+      }
+
+      btnExportICS.addEventListener('click', () => {
+        const records = getFilteredICS();
+        if (!records.length) {
+          alert('No ICS records to export. Please add a record first.');
+          return;
+        }
+
+        const html = buildICSDocumentHTML(records);
+        const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+        const url = URL.createObjectURL(blob);
+
+        const fileName = `Inventory_Custodian_Slips_${new Date().toISOString().slice(0,10)}.doc`;
+
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        setTimeout(() => URL.revokeObjectURL(url), 1500);
+      });
+
+      // ============================================================
+      // PAR MODULE
+      // ============================================================
+      const parTableBody = document.getElementById('parTableBody');
+      const parSearch = document.getElementById('parSearch');
+      const parFooterInfo = document.getElementById('parFooterInfo');
+      const parModal = document.getElementById('parModal');
+      const parForm = document.getElementById('parForm');
+      const parModalTitle = document.getElementById('parModalTitle');
+      const parError = document.getElementById('parError');
+      const btnExportPAR = document.getElementById('btnExportPAR');
+      const deleteConfirmOverlay = document.getElementById('deleteConfirmOverlay');
+      const deleteConfirmMessage = document.getElementById('deleteConfirmMessage');
+      const deleteConfirmCancel = document.getElementById('deleteConfirmCancel');
+      const deleteConfirmButton = document.getElementById('deleteConfirmButton');
+
+      let parRecords = [];
+      let parEditingId = null;
+      let pendingDelete = null;
+      let deleteTrigger = null;
+
+      function mapParRow(row) {
+        return {
+          id: row.id,
+          parNo: row.par_no,
+          qty: row.qty,
+          unit: row.unit,
+          desc: row.description,
+          propNo: row.property_number,
+          date: row.date_acquired,
+          amount: row.amount
+        };
+      }
+
+      async function fetchPAR() {
+        const { data, error } = await supabaseClient
+          .from('par_records')
+          .select('id, par_no, qty, unit, description, property_number, date_acquired, amount, created_at')
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          parRecords = [];
+          return;
+        }
+        parRecords = (data || []).map(mapParRow);
+      }
+
+      function getFilteredPAR() {
+        const q = parSearch.value.trim().toLowerCase();
+        if (!q) return parRecords;
+        return parRecords.filter((r) =>
+          [r.parNo, r.qty, r.unit, r.desc, r.propNo, r.date, r.amount]
+            .join(' ').toLowerCase().includes(q)
+        );
+      }
+
+      function renderPAR() {
+        const filtered = getFilteredPAR();
+        parTableBody.innerHTML = '';
+
+        if (filtered.length === 0) {
+          parTableBody.innerHTML = `
+            <tr class="empty-row">
+              <td colspan="8">
+                <div class="empty-state">
+                  <i class="fas fa-file-signature"></i>
+                  <h3>${parRecords.length === 0 ? 'No PAR records yet' : 'No matching records'}</h3>
+                  <p>${parRecords.length === 0
+                    ? 'Property Acknowledge Receipts will appear here once created.'
+                    : 'Try a different search term.'}</p>
+                </div>
+              </td>
+            </tr>`;
+        } else {
+          filtered.forEach((r) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${esc(r.parNo || '')}</td>
+              <td>${esc(r.qty)}</td>
+              <td>${esc(r.unit)}</td>
+              <td>${esc(r.desc)}</td>
+              <td>${esc(r.propNo)}</td>
+              <td>${esc(r.date)}</td>
+              <td>${formatCurrency(r.amount)}</td>
+              <td>
+                <div class="row-actions">
+                  <button class="row-btn" data-download="${r.id}" title="Download"><i class="fas fa-download"></i></button>
+                  <button class="row-btn" data-edit="${r.id}" title="Edit"><i class="fas fa-pen"></i></button>
+                  <button class="row-btn danger" data-delete="${r.id}" title="Delete"><i class="fas fa-trash"></i></button>
+                </div>
+              </td>`;
+            parTableBody.appendChild(tr);
+          });
+        }
+
+        parFooterInfo.textContent = `Showing ${filtered.length} of ${parRecords.length} entries`;
+        updateStats();
+      }
+
+      function openPARModal(record) {
+        parError.textContent = '';
+        if (record) {
+          parEditingId = record.id;
+          parModalTitle.textContent = 'Edit PAR Record';
+          document.getElementById('parQty').value = record.qty;
+          document.getElementById('parUnit').value = record.unit;
+          document.getElementById('parDesc').value = record.desc;
+          document.getElementById('parPropNo').value = record.propNo;
+          document.getElementById('parDate').value = record.date;
+          document.getElementById('parAmount').value = record.amount;
+        } else {
+          parEditingId = null;
+          parModalTitle.textContent = 'New PAR Record';
+          parForm.reset();
+          document.getElementById('parDate').valueAsDate = new Date();
+        }
+        parModal.classList.add('open');
+      }
+
+      function closePARModal() {
+        parModal.classList.remove('open');
+      }
+
+      function openDeleteConfirmation(id, trigger, recordType) {
+        pendingDelete = { id, recordType };
+        deleteTrigger = trigger;
+        deleteConfirmMessage.textContent = `Delete this ${recordType} record?`;
+        deleteConfirmOverlay.classList.add('open');
+        deleteConfirmOverlay.setAttribute('aria-hidden', 'false');
+        deleteConfirmCancel.focus();
+      }
+
+      function closeDeleteConfirmation(restoreFocus) {
+        deleteConfirmOverlay.classList.remove('open');
+        deleteConfirmOverlay.setAttribute('aria-hidden', 'true');
+        pendingDelete = null;
+        const trigger = deleteTrigger;
+        deleteTrigger = null;
+        if (restoreFocus && trigger && document.contains(trigger)) trigger.focus();
+      }
+
+      document.getElementById('btnNewPAR').addEventListener('click', () => openPARModal(null));
+      parSearch.addEventListener('input', renderPAR);
+
+      parForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        parError.textContent = '';
+
+        const qty = document.getElementById('parQty').value.trim();
+        const unit = document.getElementById('parUnit').value.trim();
+        const desc = document.getElementById('parDesc').value.trim();
+        const propNo = document.getElementById('parPropNo').value.trim();
+        const date = document.getElementById('parDate').value;
+        const amount = document.getElementById('parAmount').value.trim();
+
+        if (!qty || !unit || !desc || !propNo || !date || !amount) {
+          parError.textContent = 'Please fill in all fields.';
+          return;
+        }
+        if (Number(qty) < 1 || !Number.isInteger(Number(qty))) {
+          parError.textContent = 'Quantity must be a whole number of at least 1.';
+          return;
+        }
+        if (Number(amount) < 0 || !Number.isFinite(Number(amount))) {
+          parError.textContent = 'Amount cannot be negative.';
+          return;
+        }
+
+        const saveBtn = parForm.querySelector('button[type="submit"]');
+        if (saveBtn) saveBtn.disabled = true;
+
+        try {
+          let err = null;
+          if (parEditingId) {
+            const res = await supabaseClient
+              .from('par_records')
+              .update({
+                qty: Number(qty),
+                unit: unit.slice(0, 50),
+                description: desc.slice(0, 500),
+                property_number: propNo.slice(0, 100),
+                date_acquired: date,
+                amount: Number(amount),
+                updated_by: currentUser.id
+              })
+              .eq('id', parEditingId);
+            err = res.error;
+          } else {
+            const res = await supabaseClient
+              .from('par_records')
+              .insert({
+                qty: Number(qty),
+                unit: unit.slice(0, 50),
+                description: desc.slice(0, 500),
+                property_number: propNo.slice(0, 100),
+                date_acquired: date,
+                amount: Number(amount),
+                created_by: currentUser.id,
+                updated_by: currentUser.id
+              });
+            err = res.error;
+          }
+
+          if (err) {
+            parError.textContent = 'Unable to save PAR record. Please check your input.';
+            return;
+          }
+
+          await fetchPAR();
+          renderPAR();
+          closePARModal();
+        } finally {
+          if (saveBtn) saveBtn.disabled = false;
+        }
+      });
+
+      parTableBody.addEventListener('click', (e) => {
+        const editBtn = e.target.closest('[data-edit]');
+        const delBtn = e.target.closest('[data-delete]');
+        const downloadBtn = e.target.closest('[data-download]');
+
+        if (editBtn) {
+          const id = editBtn.getAttribute('data-edit');
+          const rec = parRecords.find((r) => r.id === id);
+          if (rec) openPARModal(rec);
+        }
+
+        if (delBtn) {
+          const id = delBtn.getAttribute('data-delete');
+          openDeleteConfirmation(id, delBtn, 'PAR');
+        }
+
+        if (downloadBtn) {
+          const id = downloadBtn.getAttribute('data-download');
+          const rec = parRecords.find((r) => r.id === id);
+          if (rec) downloadSinglePAR(rec);
+        }
+      });
+
+      deleteConfirmCancel.addEventListener('click', () => closeDeleteConfirmation(true));
+      deleteConfirmOverlay.addEventListener('click', (e) => {
+        if (e.target === deleteConfirmOverlay) closeDeleteConfirmation(true);
+      });
+      deleteConfirmButton.addEventListener('click', async () => {
+        if (!pendingDelete) return;
+        const { id, recordType } = pendingDelete;
+        closeDeleteConfirmation(false);
+        if (recordType === 'ICS') {
+          await supabaseClient.from('ics_records').delete().eq('id', id);
+          await fetchICS();
+          renderICS();
+          return;
+        }
+        await supabaseClient.from('par_records').delete().eq('id', id);
+        await fetchPAR();
+        renderPAR();
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && deleteConfirmOverlay.classList.contains('open')) {
+          closeDeleteConfirmation(true);
+        }
+      });
+
+      // ============================================================
+      // DOWNLOAD SINGLE PAR RECORD
+      // ============================================================
+      function downloadSinglePAR(record) {
+        const html = buildPARDocumentHTML([record]);
+        const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+        const url = URL.createObjectURL(blob);
+
+        const fileName = `Property_Acknowledgment_Receipt_${sanitizeFilePart(record.propNo)}.doc`;
+
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        setTimeout(() => URL.revokeObjectURL(url), 1500);
+      }
+
+      // ============================================================
+      // PAR DOWNLOAD AS WORD DOCUMENT (ONE RECEIPT PER RECORD)
+      // ============================================================
+      function buildPARDocumentHTML(records) {
+        // Build one complete PAR receipt per record, separated by page breaks
+        const receiptsHtml = records.map((r) => {
+          const desc = esc(r.desc).replace(/\n/g, '<br>');
+          let dateStr = r.date;
+          if (dateStr) {
+            const d = new Date(dateStr);
+            if (!isNaN(d.getTime())) {
+              dateStr = d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            }
+          }
+
+          return `
+            <div class="par-receipt">
+              <div class="doc-header">
+                <p>Republic of the Philippines</p>
+                <p>Province of Cagayan</p>
+                <p class="doc-agency">MUNICIPALITY OF SANTA ANA</p>
+                <p>CAGAYAN</p>
+              </div>
+
+              <div class="doc-title">PROPERTY ACKNOWLEDGMENT RECEIPT</div>
+
+              <table class="header-table">
+                <tr>
+                  <td style="width: 50%;">
+                    <div class="entity-info">
+                      <p>Entity Name: LGU SANTA ANA, CAGAYAN</p>
+                      <p>Fund Cluster: Trust Fund</p>
+                    </div>
+                  </td>
+                  <td style="width: 50%;">
+                    <div class="par-no">
+                      <p>PAR No.: <span class="par-no-line">${esc(r.parNo || '')}</span></p>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+
+              <table class="main-table">
+                <thead>
+                  <tr>
+                    <th style="width: 7%;">Quantity</th>
+                    <th style="width: 9%;">Unit</th>
+                    <th style="width: 38%;">Description</th>
+                    <th style="width: 15%;">Property Number</th>
+                    <th style="width: 15%;">Date Acquired</th>
+                    <th style="width: 16%;">Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="border:1px solid #000; text-align:center; padding:6px; vertical-align:top; width: 7%;">${esc(r.qty)}</td>
+                    <td style="border:1px solid #000; text-align:center; padding:6px; vertical-align:top; width: 9%;">${esc(r.unit)}</td>
+                    <td style="border:1px solid #000; text-align:left; padding:6px; vertical-align:top; width: 38%;">${desc}</td>
+                    <td style="border:1px solid #000; text-align:center; padding:6px; vertical-align:top; width: 15%;">${esc(r.propNo)}</td>
+                    <td style="border:1px solid #000; text-align:center; padding:6px; vertical-align:top; width: 15%;">${esc(dateStr)}</td>
+                    <td style="border:1px solid #000; text-align:right; padding:6px; vertical-align:top; width: 16%;">${formatCurrencyDoc(r.amount)}</td>
+                  </tr>
+                  ${Array(4).fill(`
+                    <tr>
+                      <td style="border:1px solid #000; padding:12px; vertical-align:top;"></td>
+                      <td style="border:1px solid #000; padding:12px; vertical-align:top;"></td>
+                      <td style="border:1px solid #000; padding:12px; vertical-align:top;"></td>
+                      <td style="border:1px solid #000; padding:12px; vertical-align:top;"></td>
+                      <td style="border:1px solid #000; padding:12px; vertical-align:top;"></td>
+                      <td style="border:1px solid #000; padding:12px; vertical-align:top;"></td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+
+              <table class="sig-table">
+                <tr>
+                  <td>
+                    <div class="sig-block">
+                      <div class="sig-label">Received by:</div>
+                      <div class="sig-name-line">
+                        <span>KRISTELYN G. BALAGSO</span>
+                      </div>
+                      <div class="sig-sub">Signature over Printed Name of End User</div>
+                      <div class="sig-pos-line">
+                        <span>Nurse-I/MDRRMO-Designate / MDRRMO</span>
+                      </div>
+                      <div class="sig-pos-sub">Position/Office</div>
+                      <div class="sig-date-line">Date</div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="sig-block">
+                      <div class="sig-label">Issued by:</div>
+                      <div class="sig-name-line">
+                        <span>RELITO V. BAUTISTA</span>
+                      </div>
+                      <div class="sig-sub">Signature over Printed Name of Supply and/or Property Custodian</div>
+                      <div class="sig-pos-line">
+                        <span>Supply Officer II</span>
+                      </div>
+                      <div class="sig-pos-sub">Position/Office</div>
+                      <div class="sig-date-line">Date</div>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </div>`;
+        }).join('<br clear="all" style="mso-special-character:line-break;page-break-before:always">');
+
+        return `
+          <html xmlns:o="urn:schemas-microsoft-com:office:office"
+                xmlns:w="urn:schemas-microsoft-com:office:word"
+                xmlns="http://www.w3.org/TR/REC-html40">
+          <head>
+            <meta charset="utf-8">
+            <title>Property Acknowledgment Receipt</title>
+            <!--[if gte mso 9]>
+            <xml>
+              <w:WordDocument>
+                <w:View>Print</w:View>
+                <w:Zoom>100</w:Zoom>
+                <w:DoNotOptimizeForBrowser/>
+              </w:WordDocument>
+            </xml>
+            <![endif]-->
+            <style>
+              @page {
+                size: 27.94cm 21.59cm;
+                margin: 1.5cm 1.8cm 1.5cm 1.8cm;
+                mso-page-orientation: landscape;
+              }
+              body {
+                font-family: 'Times New Roman', Times, serif;
+                font-size: 11pt;
+                color: #000;
+                line-height: 1.3;
+                background: white;
+              }
+              .doc-header {
+                text-align: center;
+                margin-bottom: 20px;
+              }
+              .doc-header p {
+                margin: 0;
+                line-height: 1.3;
+                font-size: 11pt;
+              }
+              .doc-header .doc-agency {
+                font-weight: bold;
+                font-size: 12pt;
+              }
+              .doc-title {
+                text-align: center;
+                font-size: 16pt;
+                font-weight: bold;
+                letter-spacing: 1px;
+                margin: 20px 0 10px 0;
+              }
+              
+              /* ===== HEADER TABLE: Entity & PAR No. side by side ===== */
+              table.header-table {
+                width: 100%;
+                border-collapse: collapse;
+                border: none;
+                margin-bottom: 10px;
+              }
+              table.header-table td {
+                border: none;
+                padding: 0;
+                vertical-align: top;
+              }
+              .entity-info {
+                text-align: left;
+                font-size: 11pt;
+                line-height: 1.3;
+              }
+              .entity-info p {
+                margin: 0;
+              }
+              .par-no {
+                text-align: right;
+                font-size: 11pt;
+                padding-top: 0;
+              }
+              .par-no p {
+                margin: 0;
+              }
+              .par-no-line {
+                display: inline-block;
+                width: 180px;
+                border-bottom: 1px solid #000;
+                line-height: 1.15;
+              }
+              
+              table.main-table {
+                width: 100%;
+                border-collapse: collapse;
+                border: 2px solid #000;
+                margin-top: 5px;
+              }
+              table.main-table th {
+                border: 1px solid #000;
+                padding: 8px 4px;
+                font-size: 11pt;
+                font-weight: bold;
+                text-align: center;
+                vertical-align: middle;
+                background-color: #f2f2f2;
+              }
+              table.main-table td {
+                border: 1px solid #000;
+                padding: 6px;
+                font-size: 11pt;
+                vertical-align: top;
+              }
+              
+              /* ===== SIGNATURE TABLE — LEVELED, CLEAN ===== */
+              table.sig-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 15px;
+                border: 2px solid #000;
+              }
+              table.sig-table td {
+                width: 50%;
+                vertical-align: top;
+                padding: 15px 25px;
+                font-size: 11pt;
+                border: 1px solid #000;
+              }
+              
+              .sig-block {
+                padding: 5px 0;
+              }
+              .sig-label {
+                font-size: 11pt;
+                margin-bottom: 30px;
+                text-align: left;
+              }
+              .sig-name-line {
+                text-align: center;
+                margin-top: 10px;
+              }
+              .sig-name-line span {
+                display: inline-block;
+                font-weight: bold;
+                text-transform: uppercase;
+                border-bottom: 1px solid #000;
+                padding: 0 15px 2px 15px;
+                min-width: 220px;
+                text-align: center;
+                font-size: 11pt;
+              }
+              .sig-sub {
+                font-size: 10pt;
+                text-align: center;
+                margin-top: 3px;
+              }
+              .sig-pos-line {
+                margin-top: 25px;
+                text-align: center;
+              }
+              .sig-pos-line span {
+                display: inline-block;
+                font-weight: bold;
+                border-bottom: 1px solid #000;
+                padding: 0 15px 2px 15px;
+                min-width: 170px;
+                text-align: center;
+                font-size: 11pt;
+              }
+              .sig-pos-sub {
+                font-size: 10pt;
+                text-align: center;
+                margin-top: 3px;
+                margin-bottom: 25px;
+              }
+              .sig-date-line {
+                border-top: 1px solid #000;
+                width: 55%;
+                margin: 10px auto 0;
+                text-align: center;
+                font-size: 10pt;
+                padding-top: 3px;
+              }
+            </style>
+          </head>
+          <body>
+            ${receiptsHtml}
+          </body>
+          </html>`;
+      }
+
+      btnExportPAR.addEventListener('click', () => {
+        const records = getFilteredPAR();
+        if (!records.length) {
+          alert('No PAR records to export. Please add a record first.');
+          return;
+        }
+
+        const html = buildPARDocumentHTML(records);
+        const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+        const url = URL.createObjectURL(blob);
+
+        const fileName = `Property_Acknowledgment_Receipts_${new Date().toISOString().slice(0,10)}.doc`;
+
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        setTimeout(() => URL.revokeObjectURL(url), 1500);
+      });
+
+      // ============================================================
+      // ADMIN USER ACCOUNTS MODULE
+      // ============================================================
+      const adminUsersTableBody = document.getElementById('adminUsersTableBody');
+      const adminUserSearch = document.getElementById('adminUserSearch');
+      const adminUsersFooterInfo = document.getElementById('adminUsersFooterInfo');
+      const btnCreateAccount = document.getElementById('btnCreateAccount');
+      const createAccountModal = document.getElementById('createAccountModal');
+      const createAccountForm = document.getElementById('createAccountForm');
+      const createAccountError = document.getElementById('createAccountError');
+      const btnSubmitCreateAccount = document.getElementById('btnSubmitCreateAccount');
+
+      let adminUsers = [];
+
+      function getFilteredUsers() {
+        const q = (adminUserSearch?.value || '').trim().toLowerCase();
+        if (!q) return adminUsers;
+        return adminUsers.filter((u) =>
+          [u.full_name, u.email, u.role, u.is_active ? 'active' : 'inactive']
+            .join(' ').toLowerCase().includes(q)
+        );
+      }
+
+      function renderAdminUsers() {
+        if (!adminUsersTableBody || !adminUsersFooterInfo) return;
+        const filtered = getFilteredUsers();
+        adminUsersTableBody.innerHTML = '';
+
+        if (filtered.length === 0) {
+          adminUsersTableBody.innerHTML = `
+            <tr class="empty-row">
+              <td colspan="6">
+                <div class="empty-state">
+                  <i class="fas fa-users"></i>
+                  <h3>${adminUsers.length === 0 ? 'No accounts found' : 'No matching accounts'}</h3>
+                  <p>${adminUsers.length === 0
+                    ? 'Create a custodian or admin account to get started.'
+                    : 'Try a different search term.'}</p>
+                </div>
+              </td>
+            </tr>`;
+        } else {
+          filtered.forEach((u) => {
+            const isSelf = u.id === currentUser.id;
+            const createdDate = u.created_at
+              ? new Date(u.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+              : '—';
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${esc(u.full_name)}</td>
+              <td>${esc(u.email)}</td>
+              <td><span class="role-badge ${u.role === 'admin' ? 'admin' : 'custodian'}">${esc(u.role)}</span></td>
+              <td><span class="status-badge ${u.is_active ? 'active' : 'inactive'}">${u.is_active ? 'Active' : 'Inactive'}</span></td>
+              <td>${esc(createdDate)}</td>
+              <td>
+                <div class="row-actions" style="justify-content:flex-end;">
+                  ${isSelf ? '' : `<button class="row-btn ${u.is_active ? 'danger' : ''}" data-toggle-user="${esc(u.id)}" data-next-active="${u.is_active ? 'false' : 'true'}" title="${u.is_active ? 'Deactivate' : 'Activate'}"><i class="fas ${u.is_active ? 'fa-user-slash' : 'fa-user-check'}"></i></button>`}
+                </div>
+              </td>`;
+            adminUsersTableBody.appendChild(tr);
+          });
+        }
+
+        adminUsersFooterInfo.textContent = `Showing ${filtered.length} of ${adminUsers.length} accounts`;
+      }
+
+      async function fetchAdminUsers() {
+        if (!isAdmin) return;
+        const token = await getFreshAccessToken();
+        if (!token) return;
+
+        const res = await fetch('/api/admin/users', {
+          method: 'GET',
+          headers: { Authorization: `Bearer ${token}` },
+          cache: 'no-store'
+        });
+        if (!res.ok) return;
+        const payload = await res.json().catch(() => ({}));
+        adminUsers = payload.users || [];
+        renderAdminUsers();
+      }
+
+      function openCreateAccountModal() {
+        if (!isAdmin || !createAccountModal) return;
+        createAccountError.textContent = '';
+        createAccountForm.reset();
+        createAccountModal.classList.add('open');
+      }
+
+      function closeCreateAccountModal() {
+        if (createAccountModal) createAccountModal.classList.remove('open');
+      }
+
+      if (btnCreateAccount) {
+        btnCreateAccount.addEventListener('click', openCreateAccountModal);
+      }
+      if (adminUserSearch) {
+        adminUserSearch.addEventListener('input', renderAdminUsers);
+      }
+
+      if (createAccountForm) {
+        createAccountForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          createAccountError.textContent = '';
+
+          const fullName = document.getElementById('newAccName').value.trim();
+          const email = document.getElementById('newAccEmail').value.trim().toLowerCase();
+          const role = document.getElementById('newAccRole').value === 'admin' ? 'admin' : 'custodian';
+          const password = document.getElementById('newAccPassword').value;
+          const confirm = document.getElementById('newAccConfirm').value;
+
+          if (!fullName || !email || !password || !confirm) {
+            createAccountError.textContent = 'Please fill in all fields.';
+            return;
+          }
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            createAccountError.textContent = 'Please enter a valid email address.';
+            return;
+          }
+          if (password.length < 8 || !/[a-z]/.test(password) || !/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
+            createAccountError.textContent = 'Password must be at least 8 characters with uppercase, lowercase, and a number.';
+            return;
+          }
+          if (password !== confirm) {
+            createAccountError.textContent = 'Passwords do not match.';
+            return;
+          }
+
+          btnSubmitCreateAccount.disabled = true;
+          btnSubmitCreateAccount.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating…';
+
+          try {
+            const token = await getFreshAccessToken();
+            const res = await fetch('/api/admin/create-user', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+              },
+              body: JSON.stringify({ fullName, email, role, password })
+            });
+
+            const payload = await res.json().catch(() => ({}));
+            if (!res.ok) {
+              createAccountError.textContent = payload.error || 'Unable to create account.';
+              return;
+            }
+
+            await fetchAdminUsers();
+            closeCreateAccountModal();
+          } catch {
+            createAccountError.textContent = 'Network error while creating account.';
+          } finally {
+            btnSubmitCreateAccount.disabled = false;
+            btnSubmitCreateAccount.innerHTML = '<i class="fas fa-user-plus"></i> Create Account';
+          }
+        });
+      }
+
+      if (adminUsersTableBody) {
+        adminUsersTableBody.addEventListener('click', async (e) => {
+          const toggleBtn = e.target.closest('[data-toggle-user]');
+          if (!toggleBtn || !isAdmin) return;
+
+          const userId = toggleBtn.getAttribute('data-toggle-user');
+          const nextActive = toggleBtn.getAttribute('data-next-active') === 'true';
+          toggleBtn.disabled = true;
+
+          try {
+            const token = await getFreshAccessToken();
+            const res = await fetch('/api/admin/users', {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+              },
+              body: JSON.stringify({ userId, isActive: nextActive })
+            });
+            if (res.ok) {
+              await fetchAdminUsers();
+            }
+          } finally {
+            toggleBtn.disabled = false;
+          }
+        });
+      }
+
+      // ============================================================
+      // MODAL CLOSE HANDLERS
+      // ============================================================
+      document.querySelectorAll('[data-close]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-close');
+          if (id === 'icsModal') closeICSModal();
+          if (id === 'parModal') closePARModal();
+          if (id === 'createAccountModal') closeCreateAccountModal();
+        });
+      });
+
+      [icsModal, parModal, createAccountModal].filter(Boolean).forEach((overlay) => {
+        overlay.addEventListener('click', (e) => {
+          if (e.target === overlay) {
+            overlay.classList.remove('open');
+          }
+        });
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          icsModal.classList.remove('open');
+          parModal.classList.remove('open');
+          if (createAccountModal) createAccountModal.classList.remove('open');
+        }
+      });
+
+      // ============================================================
+      // DASHBOARD STATS
+      // ============================================================
+      function updateStats() {
+        const totalItems = icsRecords.length + parRecords.length;
+        const el1 = document.getElementById('statTotalItems');
+        const el2 = document.getElementById('statIcsCount');
+        const el3 = document.getElementById('statParCount');
+
+        if (el1) el1.textContent = totalItems;
+        if (el2) el2.textContent = icsRecords.length;
+        if (el3) el3.textContent = parRecords.length;
+      }
+
+      // ============================================================
+      // INITIAL RENDER
+      // ============================================================
+      await Promise.all([
+        fetchICS(),
+        fetchPAR(),
+        isAdmin ? fetchAdminUsers() : Promise.resolve()
+      ]);
+      renderICS();
+      renderPAR();
+      updateStats();
+    })();
+  </script>
+</body>
+</html>
