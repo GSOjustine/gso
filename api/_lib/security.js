@@ -182,8 +182,9 @@ export async function requireAdmin(req, res) {
       .maybeSingle();
 
     if (profileErr) {
+      const detail = profileErr.code || profileErr.message || 'unknown';
       res.status(503).json({
-        error: 'Unable to verify admin profile on server. Check SUPABASE_SERVICE_ROLE_KEY in Vercel.'
+        error: `Unable to verify admin profile on server (${detail}). Check SUPABASE_SERVICE_ROLE_KEY in Vercel.`
       });
       return null;
     }

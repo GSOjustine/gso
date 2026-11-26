@@ -5,6 +5,6 @@
   "description": "GSO Custodian Inventory System with Supabase Auth, Postgres RLS, and Admin Account Provisioning",
   "type": "module",
   "dependencies": {
-    "@supabase/supabase-js": "2.49.4"
+    "@supabase/supabase-js": "2.119.2"
   }
 }
