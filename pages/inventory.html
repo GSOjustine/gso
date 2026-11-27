@@ -3061,12 +3061,20 @@
         const { id, recordType } = pendingDelete;
         closeDeleteConfirmation(false);
         if (recordType === 'ICS') {
-          await supabaseClient.from('ics_records').delete().eq('id', id);
+          const { error } = await supabaseClient.from('ics_records').delete().eq('id', id);
+          if (error) {
+            alert('Unable to delete ICS record.');
+            return;
+          }
           await fetchICS();
           renderICS();
           return;
         }
-        await supabaseClient.from('par_records').delete().eq('id', id);
+        const { error } = await supabaseClient.from('par_records').delete().eq('id', id);
+        if (error) {
+          alert('Unable to delete PAR record.');
+          return;
+        }
         await fetchPAR();
         renderPAR();
       });
